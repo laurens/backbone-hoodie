@@ -31,7 +31,7 @@
   };
 
   Backbone.sync = function (method, modelOrCollection, options) {
-    var attributes, id, promise, type;
+    var attributes, id, promise, type, storeOptions;
 
     id = modelOrCollection.id;
     attributes = options.attrs || modelOrCollection.toJSON();
@@ -41,7 +41,9 @@
       type = modelOrCollection.model.prototype.type;
     }
 
-    options.backbone = true;
+    storeOptions = {
+      backbone: true
+    };
 
     switch (method) {
     case 'read':
@@ -56,19 +58,19 @@
       }
       break;
     case 'create':
-      promise = Backbone.hoodie.store.add(type, attributes, options)
+      promise = Backbone.hoodie.store.add(type, attributes, storeOptions)
       .done(function (attributes) {
         modelOrCollection.set(attributes);
       });
       break;
     case 'update':
-      promise = Backbone.hoodie.store.updateOrAdd(type, id, modelOrCollection.changed, options)
+      promise = Backbone.hoodie.store.updateOrAdd(type, id, modelOrCollection.changed, storeOptions)
       .done(function (attributes) {
         modelOrCollection.set(attributes);
       });
       break;
     case 'delete':
-      promise = Backbone.hoodie.store.remove(type, id, options);
+      promise = Backbone.hoodie.store.remove(type, id, storeOptions);
     }
 
     if (options.success) {
@@ -98,7 +100,7 @@
       store = Backbone.hoodie.store(type);
 
       store.on('add', function (attributes, options) {
-        if (!options.remote) {
+        if (options.backbone) {
           return;
         }
 
@@ -108,7 +110,7 @@
       store.on('remove', function (attributes, options) {
         var record;
 
-        if (!options.remote) {
+        if (options.backbone) {
           return;
         }
 
@@ -121,7 +123,7 @@
       store.on('update', function (attributes, options) {
         var record;
 
-        if (!options.remote) {
+        if (options.backbone) {
           return;
         }
 

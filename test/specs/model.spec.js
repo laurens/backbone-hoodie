@@ -46,7 +46,7 @@ describe('Backbone.Model', function () {
       });
 
       it('delegates to Backbone.hoodie.store.add', function () {
-        expect(this.stub).to.have.been.calledWith('task', { name: 'New Task' });
+        expect(this.stub).to.have.been.calledWith('task', { name: 'New Task' }, { backbone: true });
       });
 
       describe('success', function () {
@@ -92,7 +92,7 @@ describe('Backbone.Model', function () {
       });
 
       it('delegates to Backbone.hoodie.store.updateOrAdd with the changed attributes', function () {
-        expect(this.stub).to.have.been.calledWith('task', this.task.id, { name: 'Updated Name' });
+        expect(this.stub).to.have.been.calledWith('task', this.task.id, { name: 'Updated Name' }, { backbone: true });
       });
 
       describe('success', function () {
@@ -183,7 +183,7 @@ describe('Backbone.Model', function () {
     });
 
     it('delegates to Backbone.hoodie.store.remove', function () {
-      expect(this.stub).to.have.been.calledWith('task', this.task.id);
+      expect(this.stub).to.have.been.calledWith('task', this.task.id, { backbone: true });
     });
 
     describe('success', function () {
