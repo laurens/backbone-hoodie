@@ -33,6 +33,10 @@
   Backbone.sync = function (method, modelOrCollection, options) {
     var attributes, id, promise, type, storeOptions;
 
+    if (options.hoodie) {
+      return;
+    }
+
     id = modelOrCollection.id;
     attributes = options.attrs || modelOrCollection.toJSON();
     type = modelOrCollection.type;
@@ -104,7 +108,7 @@
           return;
         }
 
-        self.add(attributes, options);
+        self.add(attributes);
       });
 
       store.on('remove', function (attributes, options) {
@@ -116,7 +120,9 @@
 
         record = self.get(attributes.id);
         if (record) {
-          record.destroy(options);
+          record.destroy({
+            hoodie: true
+          });
         }
       });
 
@@ -129,7 +135,7 @@
 
         record = self.get(attributes.id);
         if (record) {
-          record.set(attributes, options);
+          record.set(attributes);
         }
       });
     }
