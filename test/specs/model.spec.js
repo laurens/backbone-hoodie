@@ -11,10 +11,30 @@ describe('Backbone.Model', function () {
       type: 'task'
     });
 
-    this.testAttributes = {
-      id: 'juyc3ej',
+    // a fresh task
+    this.newTaskAttributes = {
       name: 'New Task'
     };
+
+    // a persisted task
+    this.taskAttributes = _.extend({}, this.newTaskAttributes, {
+      id: 'juyc3ej',
+      type: 'todo',
+      createdBy: 'pe3vv6m',
+      createdAt: new Date(),
+      updatedAt: new Date()
+    });
+
+    // a changeset for a task
+    this.changedTaskAttributes = {
+      name: 'Updated Name',
+      tags: 'foo, bar, baz'
+    }
+
+    // a changed task that has been persisted
+    this.updatedTaskAttributes = _.extend({}, this.taskAttributes, this.changedTaskAttributes, {
+      updatedAt: new Date()
+    });
 
     this.sandbox = sinon.sandbox.create();
 
@@ -37,7 +57,7 @@ describe('Backbone.Model', function () {
         this.spyOnSuccess = sinon.spy();
         this.spyOnError = sinon.spy();
 
-        this.task = new this.Task({ name: 'New Task' });
+        this.task = new this.Task(this.newTaskAttributes);
 
         this.task.save({}, {
           success: this.spyOnSuccess,
@@ -46,16 +66,16 @@ describe('Backbone.Model', function () {
       });
 
       it('delegates to Backbone.hoodie.store.add', function () {
-        expect(this.stub).to.have.been.calledWith('task', { name: 'New Task' }, { backbone: true });
+        expect(this.stub).to.have.been.calledWith('task', this.newTaskAttributes, { backbone: true });
       });
 
       describe('success', function () {
         beforeEach(function () {
-          this.deferred.resolve(this.testAttributes);
+          this.deferred.resolve(this.taskAttributes);
         });
 
         it('updates the attributes', function () {
-          expect(this.task.attributes).to.deep.eql(this.testAttributes);
+          expect(this.task.attributes).to.deep.eql(this.taskAttributes);
         });
 
         it('calls the success callback', function () {
@@ -81,29 +101,25 @@ describe('Backbone.Model', function () {
         this.spyOnSuccess = sinon.spy();
         this.spyOnError = sinon.spy();
 
-        this.task = new this.Task(this.testAttributes);
+        this.task = new this.Task(this.taskAttributes);
 
-        this.task.save({
-          name: 'Updated Name'
-        }, {
+        this.task.save(this.changedTaskAttributes, {
           success: this.spyOnSuccess,
           error: this.spyOnError
         });
       });
 
       it('delegates to Backbone.hoodie.store.updateOrAdd with the changed attributes', function () {
-        expect(this.stub).to.have.been.calledWith('task', this.task.id, { name: 'Updated Name' }, { backbone: true });
+        expect(this.stub).to.have.been.calledWith('task', this.task.id, this.changedTaskAttributes, { backbone: true });
       });
 
       describe('success', function () {
         beforeEach(function () {
-          this.updatedTestAttributes = this.testAttributes;
-          this.updatedTestAttributes.name = 'Updated Name';
-          this.deferred.resolve(this.updatedTestAttributes);
+          this.deferred.resolve(this.updatedTaskAttributes);
         });
 
         it('updates the attributes', function () {
-          expect(this.task.attributes).to.deep.eql(this.updatedTestAttributes);
+          expect(this.task.attributes).to.deep.eql(this.updatedTaskAttributes);
         });
 
         it('calls the success callback', function () {
@@ -130,7 +146,7 @@ describe('Backbone.Model', function () {
       this.spyOnSuccess = sinon.spy();
       this.spyOnError = sinon.spy();
 
-      this.task = new this.Task({ id: this.testAttributes.id } );
+      this.task = new this.Task({ id: this.taskAttributes.id } );
       this.task.fetch({
         success: this.spyOnSuccess,
         error: this.spyOnError
@@ -138,16 +154,16 @@ describe('Backbone.Model', function () {
     });
 
     it('delegates to Backbone.hoodie.store.find', function () {
-      expect(this.stub).to.have.been.calledWith('task', this.task.id);
+      expect(this.stub).to.have.been.calledWith('task', this.taskAttributes.id);
     });
 
     describe('success', function () {
       beforeEach(function () {
-        this.deferred.resolve(this.testAttributes);
+        this.deferred.resolve(this.taskAttributes);
       });
 
       it('updates the attributes', function () {
-        expect(this.task.attributes).to.deep.eql(this.testAttributes);
+        expect(this.task.attributes).to.deep.eql(this.taskAttributes);
       });
 
       it('calls the success callback', function () {
@@ -173,7 +189,7 @@ describe('Backbone.Model', function () {
       this.spyOnSuccess = sinon.spy();
       this.spyOnError = sinon.spy();
 
-      this.task = new this.Task(this.testAttributes);
+      this.task = new this.Task(this.taskAttributes);
       this.task.save();
 
       this.task.destroy({
@@ -183,7 +199,7 @@ describe('Backbone.Model', function () {
     });
 
     it('delegates to Backbone.hoodie.store.remove', function () {
-      expect(this.stub).to.have.been.calledWith('task', this.task.id, { backbone: true });
+      expect(this.stub).to.have.been.calledWith('task', this.taskAttributes.id, { backbone: true });
     });
 
     describe('success', function () {
